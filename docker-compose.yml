@@ -1,0 +1,78 @@
+services:
+  smartops:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      APP_ENV: production
+      LOG_LEVEL: INFO
+      OLLAMA_BASE_URL: http://ollama:11434
+      LLM_MODEL_A: llama3.2:3b
+      LLM_MODEL_B: mistral:7b
+      LLM_FALLBACK_MODE: "false"
+      RAG_PERSIST_DIR: /app/data/chroma
+      RL_STATE_PATH: /app/data/rl_bandit_state.json
+      TRANSACTION_STATE_PATH: /app/data/transactions.json
+      AUDIT_LOG_PATH: /app/data/audit.jsonl
+      RL_LATENCY_CAP_SECONDS: "10"
+      RL_FEEDBACK_TIMEOUT_SECONDS: "300"
+      KNOWLEDGE_BASE_DIR: /app/knowledge_base
+      CORS_ORIGINS: "*"
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: postgresql://smartops:smartops@postgres:5432/smartops
+      API_KEY: ${API_KEY:?Set API_KEY to a strong secret before starting compose}
+      ADMIN_API_KEY: ${ADMIN_API_KEY:-}
+      TRUST_PROXY_HEADERS: "false"
+      AGENT_MAX_STEPS: "3"
+      WARMUP_ON_STARTUP: "true"
+      JOB_WORKERS: "2"
+      JOB_QUEUE_MAX: "1000"
+      OTEL_ENABLED: "false"
+      RATE_LIMIT_PER_MINUTE: "60"
+    volumes:
+      - smartops_data:/app/data
+    depends_on:
+      ollama:
+        condition: service_started
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_started
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/ready"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 120s
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: smartops
+      POSTGRES_PASSWORD: smartops
+      POSTGRES_DB: smartops
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  smartops_data:
+  ollama_data:
+  redis_data:
+  postgres_data:

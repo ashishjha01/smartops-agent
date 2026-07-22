@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "smartops"
+version = "1.0.0"
+description = "Self-optimizing technical support agent with RAG, ReAct, and contextual bandits"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+
+[tool.setuptools.packages.find]
+include = ["smartops*"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"

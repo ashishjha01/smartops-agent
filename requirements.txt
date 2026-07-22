@@ -1,0 +1,18 @@
+# SmartOps runtime dependencies
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+pydantic-settings==2.7.0
+httpx==0.28.1
+numpy==2.2.1
+chromadb==0.5.23
+sentence-transformers==3.3.1
+python-multipart==0.0.20
+prometheus-client==0.21.1
+structlog==24.4.0
+tenacity==9.0.0
+redis==5.2.1
+psycopg[binary]==3.2.3
+
+# Optional OpenTelemetry (install extras: pip install -r requirements-otel.txt)
+# Soft-imported when OTEL_ENABLED=true

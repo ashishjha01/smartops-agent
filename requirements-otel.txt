@@ -1,0 +1,5 @@
+# Optional OpenTelemetry extras for SmartOps
+opentelemetry-api==1.29.0
+opentelemetry-sdk==1.29.0
+opentelemetry-exporter-otlp-proto-http==1.29.0
+opentelemetry-instrumentation-fastapi==0.50b0
